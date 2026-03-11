@@ -341,12 +341,27 @@ For any other language, add custom patterns to `codemunch.config.json`:
 
 **Claude Code** — this is a Claude Code plugin, not an MCP server.
 
-At least one of:
-- Any LSP server for your language (usually already installed if you use VS Code)
-- `universal-ctags` — `brew install universal-ctags` / `apt install universal-ctags`
-- `ripgrep` — `brew install ripgrep` / `apt install ripgrep` / `scoop install ripgrep`
+For the best experience, install **all** of the following. codemunch uses them as a fallback chain (LSP → ctags → ripgrep), so having all three ensures maximum precision and coverage:
 
-`jq` is recommended for fast index queries but codemunch falls back to Python if unavailable.
+```bash
+# macOS (Homebrew)
+brew install universal-ctags ripgrep jq
+
+# Ubuntu / Debian
+apt install universal-ctags ripgrep jq
+
+# Windows (Scoop)
+scoop install ctags ripgrep jq
+```
+
+| Tool | Why | Required? |
+|---|---|---|
+| **LSP server** | Most precise — exact types, signatures, cross-file references. Usually already installed if you use VS Code. | Recommended |
+| **universal-ctags** | Fast symbol extraction for 40+ languages. Used when LSP isn't available for a language. | Recommended |
+| **ripgrep** | Last-resort pattern matching. Also used for reference search fallback. | Recommended |
+| **jq** | Fast JSON index queries. Falls back to Python if unavailable. | Optional |
+
+codemunch works with just **one** of the above, but having all three gives you the best results — LSP for precision, ctags for breadth, and ripgrep as a safety net.
 
 **No Python packages. No npm install. No compilation.**
 
