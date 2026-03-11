@@ -1,0 +1,8 @@
+{
+  "name": "codemunch",
+  "version": "2.0.0",
+  "description": "Zero-config, token-efficient code exploration for any language. Auto-indexes your codebase and keeps the index fresh — just search, fetch, or explore. Uses LSP for precision when available, falls back to ctags, then ripgrep. Up to 99% fewer tokens than reading full files.",
+  "author": "codemunch",
+  "skills": ["detect-lsp", "index", "staleness-gate", "fetch", "search", "lsp", "ctags", "rg-fallback"],
+  "commands": ["init", "index", "fetch", "search", "refs", "explore", "status"]
+}
