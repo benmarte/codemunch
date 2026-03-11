@@ -316,7 +316,7 @@ scoop install ctags                    # Windows
 
 Built-in patterns for TypeScript, JavaScript, Python, Go, Rust, Ruby, Java, Kotlin, C, C++, PHP, Swift, Lua, Zig, and Bash.
 
-For any other language, add custom patterns to `codemunch.config.json`:
+For any other language, add custom patterns to `.claude/codemunch/config.json`:
 
 ```json
 {
@@ -415,7 +415,7 @@ After init (or manual setup), just talk to Claude normally:
 
 ## The index file
 
-codemunch writes `.codemunch/index.json` to your project root and adds `.codemunch/` to your `.gitignore` automatically. The index is a flat JSON file — no database, no daemon, no background process.
+codemunch writes `.claude/codemunch/index.json` to your project and adds `.claude/codemunch/` to your `.gitignore` automatically. The index is a flat JSON file — no database, no daemon, no background process.
 
 Each symbol entry:
 ```json
@@ -488,7 +488,7 @@ Yes. Run any command from the repo root. Use `file:` filters in search to scope 
 
 **Does codemunch send my code anywhere?**
 
-No. Everything stays local. The index lives in `.codemunch/` in your project. No network calls.
+No. Everything stays local. The index lives in `.claude/codemunch/` in your project. No network calls.
 
 **Why not just use LSP directly?**
 
