@@ -1,0 +1,26 @@
+{
+  "name": "codemunch",
+  "owner": {
+    "name": "Ben Marte",
+    "email": "benmarte@gmail.com"
+  },
+  "metadata": {
+    "description": "Token-efficient code exploration for Claude Code.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "codemunch",
+      "source": "./",
+      "description": "Zero-config, token-efficient code exploration for any language. Auto-indexes your codebase and keeps the index fresh — just search, fetch, or explore. Up to 99% fewer tokens than reading full files.",
+      "category": "development",
+      "tags": [
+        "codemunch",
+        "code-exploration",
+        "token-efficient",
+        "indexing",
+        "search"
+      ]
+    }
+  ]
+}
