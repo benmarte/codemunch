@@ -35,6 +35,33 @@ Savings: 99.6%
 
 ---
 
+## Why use codemunch?
+
+Claude Code bills by token. Every file read costs tokens — and most of those tokens are wasted on code you didn't need to see.
+
+| Scenario | Without codemunch | With codemunch | Savings |
+|---|---|---|---|
+| Find a function | Read full file (~8,000 tokens) | `search` + `fetch` (~47 tokens) | **99.4%** |
+| Trace all usages of a symbol | Read 14 files (~112,000 tokens) | `refs` (~45 tokens) | **99.96%** |
+| Understand project structure | Read 10+ files (~80,000 tokens) | `explore` (~200 tokens) | **99.75%** |
+| Typical debugging session (30 lookups) | ~240,000 tokens | ~1,200 tokens | **99.5%** |
+
+### Real-world context savings
+
+In a typical session exploring a mid-size codebase (~100 files, ~1,200 symbols):
+
+- **Without codemunch**: Claude reads ~20 full files to investigate a bug → **~160,000 tokens consumed** just on file reads
+- **With codemunch**: Claude searches, fetches, and traces refs → **~800 tokens consumed** for the same information
+
+That's **200x less context usage**, which means:
+
+- **Longer conversations** — you stay well within Claude's context window instead of hitting limits mid-task
+- **Lower costs** — fewer tokens consumed per task directly reduces your API bill
+- **Faster responses** — less input for Claude to process means quicker replies
+- **Better results** — Claude sees only the relevant code, not thousands of lines of noise, leading to more focused and accurate responses
+
+---
+
 ## How it works
 
 codemunch uses a **three-tier engine** — it picks the best available tool per language and falls back automatically. No configuration required.
