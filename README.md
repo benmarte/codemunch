@@ -98,8 +98,9 @@ Later /codemunch:refs   → checks git diff → no changes → runs immediately
 ## Quick start
 
 ```bash
-# 1. Install the plugin
-claude plugin install https://github.com/benmarte/codemunch
+# 1. Add the marketplace and install the plugin
+/plugin marketplace add benmarte/codemunch
+/plugin install codemunch@codemunch
 
 # 2. Start using it — indexing happens automatically
 /codemunch:explore
@@ -354,12 +355,9 @@ At least one of:
 ## Installation
 
 ```bash
-# From GitHub (recommended)
-claude plugin install https://github.com/benmarte/codemunch
-
-# From a local clone
-git clone https://github.com/benmarte/codemunch
-claude plugin install ./codemunch
+# Add the marketplace and install
+/plugin marketplace add benmarte/codemunch
+/plugin install codemunch@codemunch
 ```
 
 Then run the one-time init to make Claude use codemunch automatically:
