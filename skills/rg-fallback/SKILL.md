@@ -1,5 +1,5 @@
 ---
-description: Index symbols using ripgrep regex patterns when neither LSP nor ctags is available. Covers TypeScript, JavaScript, Python, Go, Rust, Ruby, Java, Kotlin, C, C++, PHP, and can be extended with custom patterns for any language via codemunch.config.json.
+description: Index symbols using ripgrep regex patterns when neither LSP nor ctags is available. Covers TypeScript, JavaScript, Python, Go, Rust, Ruby, Java, Kotlin, C, C++, PHP, and can be extended with custom patterns for any language via .claude/codemunch/config.json.
 ---
 
 # Ripgrep Pattern Indexing Skill
@@ -98,6 +98,12 @@ rg --json \
   2>/dev/null
 ```
 
+## Noise filtering
+
+Skip noise kinds: constant, property, variable, enumerator. These inflate the index 15x without adding useful navigation value. The rg patterns above should only match function/class/interface/type declarations, not `const`/`let`/`var` assignments unless they are arrow functions (e.g. `const foo = async (`). If a matched line is a plain variable assignment (no arrow function or class expression), discard it.
+
+Only keep symbols whose kind resolves to: function, method, class, interface, type, enum, namespace.
+
 ## Parse ripgrep JSONL output
 
 Each match looks like:
@@ -114,7 +120,7 @@ Extract:
 
 ## Custom patterns via config
 
-Users can add patterns for any language in `codemunch.config.json`:
+Users can add patterns for any language in `.claude/codemunch/config.json`:
 
 ```json
 {

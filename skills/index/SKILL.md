@@ -1,5 +1,5 @@
 ---
-description: Build or refresh the codemunch symbol index for the current project. Walks every source file, extracts all symbols (functions, classes, methods, constants, types) with their exact file location and line range, and writes a fast-lookup index to .codemunch/index.json. Uses LSP when available, falls back to ctags, then ripgrep patterns.
+description: Build or refresh the codemunch symbol index for the current project. Walks every source file, extracts all symbols (functions, classes, methods, constants, types) with their exact file location and line range, and writes a fast-lookup index to .claude/codemunch/index.json. Uses LSP when available, falls back to ctags, then ripgrep patterns.
 ---
 
 # Index Skill
@@ -10,14 +10,14 @@ Build the symbol index. Run once before using fetch or search, and re-run when c
 
 ```bash
 # Check config exists
-cat codemunch.config.json 2>/dev/null || echo "NOT_CONFIGURED"
+cat .claude/codemunch/config.json 2>/dev/null || echo "NOT_CONFIGURED"
 # If missing, run detect-lsp skill first
 
 # Create index directory
-mkdir -p .codemunch
+mkdir -p .claude/codemunch
 
 # Add to gitignore
-grep -q ".codemunch" .gitignore 2>/dev/null || echo ".codemunch" >> .gitignore
+grep -q ".claude/codemunch" .gitignore 2>/dev/null || echo ".claude/codemunch" >> .gitignore
 ```
 
 ---
@@ -36,7 +36,7 @@ rg --files --type [lang] 2>/dev/null || \
     -not -path "*/.git/*" \
     -not -path "*/target/*" \
     -not -path "*/__pycache__/*" \
-    -not -path "*/.codemunch/*"
+    -not -path "*/.claude/codemunch/*"
 ```
 
 Use Claude Code's built-in LSP tool (`/lsp`) to call `textDocument/documentSymbol` for each file. This returns all symbols with:
@@ -45,7 +45,9 @@ Use Claude Code's built-in LSP tool (`/lsp`) to call `textDocument/documentSymbo
 - Range (start line, end line)
 - Detail (type signature for typed languages)
 
-Store each symbol as:
+**Filter noise kinds**: Skip noise kinds: constant, property, variable, enumerator. These inflate the index 15x without adding useful navigation value. Only keep symbols where kind is one of: function, method, class, interface, type, enum, namespace.
+
+Store each kept symbol as:
 ```json
 {
   "name": "validateToken",
@@ -75,13 +77,15 @@ universal-ctags \
   --exclude=.git \
   --exclude=target \
   --exclude=__pycache__ \
-  --exclude=.codemunch \
+  --exclude=.claude/codemunch \
   --languages=[detected_languages] \
-  -f .codemunch/ctags.json \
+  -f .claude/codemunch/ctags.json \
   . 2>/dev/null
 
 # Parse ctags output into codemunch index format
 # ctags JSON fields: name, path, pattern, kind, line, end, signature
+# Filter: skip noise kinds (constant, property, variable, enumerator)
+# Only keep: function, method, class, interface, type, enum, namespace
 ```
 
 ctags supports 40+ languages natively:
@@ -89,7 +93,7 @@ ActionScript, Ada, Ant, Bash, C, C++, C#, Clojure, CoffeeScript, D, Elixir, Erla
 
 ```bash
 # Verify ctags found symbols
-wc -l .codemunch/ctags.json
+wc -l .claude/codemunch/ctags.json
 ```
 
 ---
@@ -104,43 +108,45 @@ rg --json "^(export\s+)?(async\s+)?function\s+(\w+)|^(export\s+)?(abstract\s+)?c
   --type ts --type js \
   --glob "!node_modules" \
   --glob "!.git" \
-  > .codemunch/rg-ts.jsonl
+  > .claude/codemunch/rg-ts.jsonl
 
 # Python
 rg --json "^(async\s+)?def\s+(\w+)|^class\s+(\w+)" \
   --type py \
-  > .codemunch/rg-py.jsonl
+  > .claude/codemunch/rg-py.jsonl
 
 # Go
 rg --json "^func\s+(\(.*?\)\s+)?(\w+)|^type\s+(\w+)\s+(struct|interface)" \
   --type go \
-  > .codemunch/rg-go.jsonl
+  > .claude/codemunch/rg-go.jsonl
 
 # Rust
 rg --json "^(pub(\(.*?\))?\s+)?(async\s+)?fn\s+(\w+)|^(pub(\(.*?\))?\s+)?(struct|enum|trait|impl)\s+(\w+)" \
   --type rust \
-  > .codemunch/rg-rs.jsonl
+  > .claude/codemunch/rg-rs.jsonl
 
 # Ruby
 rg --json "^\s*(def\s+(\w+)|class\s+(\w+)|module\s+(\w+))" \
   --type ruby \
-  > .codemunch/rg-rb.jsonl
+  > .claude/codemunch/rg-rb.jsonl
 
 # Java/Kotlin
 rg --json "(public|private|protected|internal)?\s*(static\s+)?\w+\s+(\w+)\s*\(" \
   --type java --type kotlin \
-  > .codemunch/rg-jvm.jsonl
+  > .claude/codemunch/rg-jvm.jsonl
 
 # C/C++
 rg --json "^\w[\w\s\*]+\s+(\w+)\s*\([^;]*\)\s*\{|^(class|struct|enum)\s+(\w+)" \
   --type c --type cpp \
-  > .codemunch/rg-c.jsonl
+  > .claude/codemunch/rg-c.jsonl
 
 # PHP
 rg --json "^(public|private|protected)?\s*(static\s+)?function\s+(\w+)|^class\s+(\w+)" \
   --type php \
-  > .codemunch/rg-php.jsonl
+  > .claude/codemunch/rg-php.jsonl
 ```
+
+**Filter noise kinds**: Skip noise kinds: constant, property, variable, enumerator. These inflate the index 15x without adding useful navigation value. The rg patterns should only match function/class/interface/type declarations, not `const`/`let`/`var` assignments unless they are arrow functions. Only keep: function, method, class, interface, type, enum, namespace.
 
 Parse the ripgrep JSONL output to extract symbol name, file, and line number. End line is estimated as start + average function length (20 lines) — this is the only imprecise step. LSP and ctags give exact end lines.
 
@@ -148,7 +154,7 @@ Parse the ripgrep JSONL output to extract symbol name, file, and line number. En
 
 ## Step: Build unified index
 
-Merge results from whichever engines ran into a single `.codemunch/index.json`:
+Merge results from whichever engines ran into a single `.claude/codemunch/index.json`:
 
 ```json
 {
@@ -226,7 +232,7 @@ If more than 50 files have changed, fall back to a full re-index — it's faster
   Symbols found:    1,247
   Engine used:      LSP (TypeScript), ctags (Python, Go), rg (Bash)
   Index size:       142 KB
-  Index written to: .codemunch/index.json
+  Index written to: .claude/codemunch/index.json
 
   Top files by symbol count:
     src/api/invoices.ts      — 34 symbols

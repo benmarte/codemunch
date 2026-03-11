@@ -1,5 +1,5 @@
 ---
-description: Detect which Language Server Protocol (LSP) servers are available for the current project and configure codemunch to use them. Checks for installed language servers across all major languages and writes the LSP config to codemunch.config.json.
+description: Detect which Language Server Protocol (LSP) servers are available for the current project and configure codemunch to use them. Checks for installed language servers across all major languages and writes the LSP config to .claude/codemunch/config.json.
 ---
 
 # LSP Detection Skill
@@ -127,9 +127,9 @@ which rg 2>/dev/null && echo "RG=rg $(rg --version | head -1)"
 which grep 2>/dev/null && echo "GREP=grep (fallback)"
 ```
 
-## Step 5 — Write codemunch.config.json
+## Step 5 — Write .claude/codemunch/config.json
 
-Create or update `codemunch.config.json` in the project root:
+Create or update `.claude/codemunch/config.json` in the project root:
 
 ```json
 {
@@ -142,7 +142,7 @@ Create or update `codemunch.config.json` in the project root:
       "last_resort": "rg"
     }
   },
-  "index_path": ".codemunch/index.json",
+  "index_path": ".claude/codemunch/index.json",
   "last_indexed": null,
   "stats": {
     "total_symbols": 0,

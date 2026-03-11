@@ -9,7 +9,7 @@ Ensures the codemunch index is fresh before any query runs. This skill is called
 ## Decision flow
 
 ```
-1. Does .codemunch/index.json exist?
+1. Does .claude/codemunch/index.json exist?
    NO  → First-run: run detect-lsp skill, then full index skill → done
    YES → Continue to step 2
 
@@ -39,7 +39,7 @@ Ensures the codemunch index is fresh before any query runs. This skill is called
 
 ```bash
 # Check for index
-if [ -f .codemunch/index.json ]; then
+if [ -f .claude/codemunch/index.json ]; then
   echo "INDEX_EXISTS"
 else
   echo "NO_INDEX"
@@ -47,7 +47,7 @@ fi
 ```
 
 If `NO_INDEX`:
-1. Check if `codemunch.config.json` exists — if not, run the **detect-lsp** skill first
+1. Check if `.claude/codemunch/config.json` exists — if not, run the **detect-lsp** skill first
 2. Run the **index** skill with full mode
 3. Report: "First-run: auto-built codemunch index (N symbols across M files)"
 4. Continue with the original query
@@ -58,10 +58,10 @@ If `NO_INDEX`:
 # Extract the generated timestamp from index
 python3 -c "
 import json
-with open('.codemunch/index.json') as f:
+with open('.claude/codemunch/index.json') as f:
     idx = json.load(f)
 print(idx.get('generated', ''))
-" 2>/dev/null || jq -r '.generated' .codemunch/index.json
+" 2>/dev/null || jq -r '.generated' .claude/codemunch/index.json
 ```
 
 ## Step 3 — Find changed files since index was built
@@ -104,7 +104,7 @@ Only consider files with these extensions (adjust per detected languages in conf
 
 Exclude:
 - Lock files (`package-lock.json`, `Cargo.lock`, `go.sum`, etc.)
-- Generated files (check `codemunch.config.json` exclude patterns)
+- Generated files (check `.claude/codemunch/config.json` exclude patterns)
 - Non-code files (`.md`, `.txt`, `.json`, `.yaml`, `.yml`, `.toml`, images, etc.)
 
 ## Step 5 — Decide: fresh or stale
@@ -136,7 +136,7 @@ python3 -c "
 import json, sys
 
 changed_files = sys.stdin.read().strip().split('\n')
-with open('.codemunch/index.json') as f:
+with open('.claude/codemunch/index.json') as f:
     idx = json.load(f)
 
 # Remove symbols from changed files

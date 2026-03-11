@@ -2,7 +2,7 @@
 description: Show codemunch configuration, index status, and session token savings
 ---
 
-Read codemunch.config.json and .codemunch/index.json and .codemunch/session.log and report:
+Read .claude/codemunch/config.json and .claude/codemunch/index.json and .claude/codemunch/session.log and report:
 
 1. **Engine config** — per language: LSP / ctags / rg and which server
 2. **Index status** — last built, total symbols, files covered, auto-update enabled

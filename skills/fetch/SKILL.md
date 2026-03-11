@@ -14,7 +14,7 @@ Called with a symbol name, e.g.: `validateToken`, `AuthService`, `getUserById`, 
 
 ```bash
 # Read the index
-cat .codemunch/index.json | python3 -c "
+cat .claude/codemunch/index.json | python3 -c "
 import json, sys
 idx = json.load(sys.stdin)
 name = '$SYMBOL_NAME'
@@ -24,7 +24,7 @@ print(json.dumps(matches, indent=2))
 
 # Or with jq if available
 jq --arg n "$SYMBOL_NAME" '[.symbols[] | select(.name | ascii_downcase == ($n | ascii_downcase))]' \
-  .codemunch/index.json 2>/dev/null
+  .claude/codemunch/index.json 2>/dev/null
 ```
 
 If no index exists: the staleness-gate skill will have already built it before this skill runs.
@@ -86,7 +86,7 @@ Show the symbol in this format:
 
 ## Step 5 — Update usage stats
 
-Append to `.codemunch/session.log`:
+Append to `.claude/codemunch/session.log`:
 ```
 fetch|validateToken|src/auth/tokens.ts:142-163|35 tokens|lsp
 ```

@@ -10,7 +10,7 @@ Use Claude Code's built-in `/lsp` tool for operations that require semantic unde
 
 ```bash
 # Check LSP config exists for this language
-cat codemunch.config.json | jq '.engines'
+cat .claude/codemunch/config.json | jq '.engines'
 
 # Verify Claude Code LSP tool is available
 # Claude Code exposes /lsp for language server operations
@@ -139,7 +139,7 @@ SYMBOL="validateToken"
 rg --json "$SYMBOL" \
   --glob "!node_modules" \
   --glob "!.git" \
-  --glob "!.codemunch" \
+  --glob "!.claude/codemunch" \
   | jq -r 'select(.type=="match") | "\(.data.path.text):\(.data.line_number)  \(.data.lines.text | rtrimstr("\n"))"' \
   | head -30
 ```

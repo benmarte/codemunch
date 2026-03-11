@@ -27,7 +27,7 @@ universal-ctags \
   --exclude=.git \
   --exclude=target \
   --exclude=__pycache__ \
-  --exclude=.codemunch \
+  --exclude=.claude/codemunch \
   --exclude=dist \
   --exclude=build \
   --exclude=vendor \
@@ -50,7 +50,9 @@ ctags JSON output per line:
 {"_type":"tag","name":"validateToken","path":"src/auth/tokens.ts","pattern":"/^async function validateToken/","kind":"function","line":142,"end":163,"signature":"(token: string): Promise<User | null>","scope":"AuthService","scopeKind":"class"}
 ```
 
-Map to codemunch symbol:
+**Filter noise kinds**: Skip noise kinds: constant, property, variable, enumerator. These inflate the index 15x without adding useful navigation value. Only keep symbols where kind is one of: function, method, class, interface, type, enum, namespace.
+
+Map each kept symbol to codemunch format:
 ```json
 {
   "name": "validateToken",
@@ -69,10 +71,10 @@ Map to codemunch symbol:
 If only basic/exuberant ctags is available (no JSON support):
 
 ```bash
-ctags -R --fields=+iaS --extra=+q -f .codemunch/tags .
+ctags -R --fields=+iaS --extra=+q -f .claude/codemunch/tags .
 ```
 
-Parse the tab-separated `.codemunch/tags` file:
+Parse the tab-separated `.claude/codemunch/tags` file:
 ```
 # format: name TAB file TAB pattern TAB kind TAB extensions...
 validateToken  src/auth/tokens.ts  /^async function validateToken/  f  line:142

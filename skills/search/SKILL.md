@@ -11,10 +11,10 @@ Find symbols without reading any files. Returns a compact index listing.
 ### By name (exact or fuzzy)
 ```bash
 # Exact
-jq '[.symbols[] | select(.name == "validateToken")]' .codemunch/index.json
+jq '[.symbols[] | select(.name == "validateToken")]' .claude/codemunch/index.json
 
 # Case-insensitive
-jq '[.symbols[] | select(.name | ascii_downcase | contains("validate"))]' .codemunch/index.json
+jq '[.symbols[] | select(.name | ascii_downcase | contains("validate"))]' .claude/codemunch/index.json
 
 # Fuzzy: split query into chars and find symbols containing all of them in order
 # e.g. "vt" matches "validateToken", "visitTree"
@@ -23,10 +23,10 @@ jq '[.symbols[] | select(.name | ascii_downcase | contains("validate"))]' .codem
 ### By kind
 ```bash
 # Find all classes
-jq '[.symbols[] | select(.kind == "class")]' .codemunch/index.json
+jq '[.symbols[] | select(.kind == "class")]' .claude/codemunch/index.json
 
 # Find all exported functions
-jq '[.symbols[] | select(.kind == "function")]' .codemunch/index.json
+jq '[.symbols[] | select(.kind == "function")]' .claude/codemunch/index.json
 
 # Kinds vary by language:
 # TypeScript: function, class, method, property, interface, type, enum, constant, variable
@@ -40,12 +40,12 @@ jq '[.symbols[] | select(.kind == "function")]' .codemunch/index.json
 
 ### By file
 ```bash
-jq --arg f "auth" '[.symbols[] | select(.file | contains($f))]' .codemunch/index.json
+jq --arg f "auth" '[.symbols[] | select(.file | contains($f))]' .claude/codemunch/index.json
 ```
 
 ### By container (class/module)
 ```bash
-jq --arg c "AuthService" '[.symbols[] | select(.container == $c)]' .codemunch/index.json
+jq --arg c "AuthService" '[.symbols[] | select(.container == $c)]' .claude/codemunch/index.json
 ```
 
 ### Combined
@@ -53,7 +53,7 @@ jq --arg c "AuthService" '[.symbols[] | select(.container == $c)]' .codemunch/in
 # All methods in a specific class
 jq --arg c "Invoice" --arg k "method" \
   '[.symbols[] | select(.container == $c and .kind == $k)]' \
-  .codemunch/index.json
+  .claude/codemunch/index.json
 ```
 
 ## Output format
@@ -94,14 +94,14 @@ When searching an unfamiliar codebase, these compound searches help:
 **"Show me the shape of this file"**
 ```bash
 jq --arg f "$FILENAME" '[.symbols[] | select(.file == $f) | {name, kind, start_line, container}]' \
-  .codemunch/index.json | jq 'sort_by(.start_line)'
+  .claude/codemunch/index.json | jq 'sort_by(.start_line)'
 ```
 
 **"What are the entry points?"**
 ```bash
 # Find exported/public top-level functions
 jq '[.symbols[] | select(.kind == "function" and (.container == null or .container == ""))]' \
-  .codemunch/index.json
+  .claude/codemunch/index.json
 ```
 
 **"Show me the class hierarchy"**
@@ -109,5 +109,5 @@ jq '[.symbols[] | select(.kind == "function" and (.container == null or .contain
 jq '[.symbols[] | select(.kind == "class" or .kind == "interface" or .kind == "struct")] | 
   group_by(.file) | 
   map({file: .[0].file, types: map(.name)})' \
-  .codemunch/index.json
+  .claude/codemunch/index.json
 ```
