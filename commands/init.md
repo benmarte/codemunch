@@ -1,5 +1,5 @@
 ---
-description: Add codemunch instructions to your project's CLAUDE.md so Claude automatically uses token-efficient exploration instead of reading full files. Run once per project.
+description: Add codemunch instructions to your project CLAUDE.md for automatic token-efficient exploration
 ---
 
 Add the following block to the project's `CLAUDE.md` file (create it if it doesn't exist). Place it near the top so it takes priority:

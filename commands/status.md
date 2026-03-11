@@ -1,5 +1,5 @@
 ---
-description: Show the current codemunch configuration and index status. Reports which engines are configured per language, index freshness, total symbols indexed, and token savings from the current session.
+description: Show codemunch configuration, index status, and session token savings
 ---
 
 Read codemunch.config.json and .codemunch/index.json and .codemunch/session.log and report:

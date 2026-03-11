@@ -1,6 +1,6 @@
 ---
-description: Get a structured overview of the codebase or a specific file/directory without reading any source files. Shows the symbol map, file structure, class hierarchy, and entry points. The token-efficient way to onboard to an unfamiliar codebase.
-arguments: optional file path or directory to focus on (defaults to whole project)
+description: Token-efficient codebase overview showing symbol map, file structure, and entry points without reading source files
+argument-hint: "[path]"
 ---
 
 **First**, run the staleness-gate skill to ensure the index is fresh.

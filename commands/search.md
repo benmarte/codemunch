@@ -1,6 +1,6 @@
 ---
-description: Search for symbols by name, kind, file, container, or pattern. Supports plain text for fuzzy name matching and filters like "kind:class", "file:auth", "in:AuthService". Returns a compact index listing with no file reads. The index auto-updates if stale.
-arguments: symbol name, pattern, or filter query
+description: Search for symbols by name, kind, file, or container with no file reads
+argument-hint: "<query>"
 ---
 
 **First**, run the staleness-gate skill to ensure the index is fresh.

@@ -1,6 +1,6 @@
 ---
-description: Find all references to a symbol across the entire codebase. Uses LSP for semantic precision (finds actual usages, not just text matches) when available, falls back to ripgrep. Returns a compact list — no files are read.
-arguments: symbol name to find references for
+description: Find all references to a symbol across the codebase using LSP or ripgrep
+argument-hint: "<symbol-name>"
 ---
 
 **First**, run the staleness-gate skill to ensure the index is fresh.
