@@ -5,7 +5,28 @@
 
 set -euo pipefail
 
-# Source file extensions to intercept
+# ─── Disable check ───────────────────────────────────────────────────────────
+# Users can disable the hook in two ways:
+#   1. Environment variable:  export CODEMUNCH_HOOK=off
+#   2. Config file:           .claude/codemunch/config.json → { "hook_enabled": false }
+#
+# Either method silently disables enforcement. Re-enable by unsetting the env
+# var or setting "hook_enabled": true in the config.
+
+if [[ "${CODEMUNCH_HOOK:-}" == "off" ]]; then
+  exit 0
+fi
+
+# Check config file (project-level)
+CONFIG_FILE=".claude/codemunch/config.json"
+if [[ -f "$CONFIG_FILE" ]]; then
+  HOOK_ENABLED=$(jq -r '.hook_enabled // true' "$CONFIG_FILE" 2>/dev/null || echo "true")
+  if [[ "$HOOK_ENABLED" == "false" ]]; then
+    exit 0
+  fi
+fi
+
+# ─── Source file extensions to intercept ─────────────────────────────────────
 SOURCE_EXTS='\.ts$|\.tsx$|\.js$|\.jsx$|\.py$|\.go$|\.rs$|\.rb$|\.java$|\.kt$|\.c$|\.cpp$|\.h$|\.hpp$|\.cs$|\.php$|\.swift$|\.lua$|\.zig$|\.ex$|\.exs$|\.hs$|\.ml$|\.mli$|\.scala$|\.sh$|\.bash$|\.vue$|\.svelte$'
 
 # Read JSON from stdin

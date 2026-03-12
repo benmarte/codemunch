@@ -422,6 +422,37 @@ Reading full files when a codemunch command exists for the task is a violation o
 The index auto-updates — no manual indexing needed.
 ```
 
+### Enforcement hook (PreToolUse)
+
+codemunch includes a **PreToolUse hook** that programmatically nudges Claude toward codemunch commands when it tries to `Read`, `Grep`, or `Glob` source files. The hook is installed automatically with the plugin — no setup needed.
+
+**How it works:**
+
+| Claude tries to... | Hook response |
+|---|---|
+| `Read` a `.ts`/`.py`/`.go`/etc. file (not for editing) | Nudge: "Use `/codemunch:fetch` instead" |
+| `Grep` for a symbol pattern (function/class names) | Nudge: "Use `/codemunch:search` or `/codemunch:refs` instead" |
+| `Glob` for source files | Nudge: "Use `/codemunch:explore` instead" |
+| `Read` for editing, non-source files, non-symbol grep | Allowed through silently |
+
+The hook doesn't block — it injects guidance so Claude self-corrects. Combined with `CLAUDE.md` instructions (from `/codemunch:init`), this achieves ~98% enforcement vs ~60-80% with instructions alone.
+
+**Disabling the hook:**
+
+If you prefer codemunch as opt-in rather than enforced, disable the hook using either method:
+
+```bash
+# Option 1: Environment variable
+export CODEMUNCH_HOOK=off
+
+# Option 2: Config file (.claude/codemunch/config.json)
+echo '{ "hook_enabled": false }' > .claude/codemunch/config.json
+```
+
+Re-enable by unsetting the env var or setting `"hook_enabled": true` in the config.
+
+---
+
 After init (or manual setup), just talk to Claude normally:
 ```
 "Fix the bug in the validateToken function"
@@ -462,7 +493,11 @@ You never need to manually re-index. The index auto-updates when any query comma
 ```
 codemunch/
 ├── .claude-plugin/
-│   └── plugin.json           # plugin manifest
+│   ├── plugin.json           # plugin manifest
+│   └── hooks/
+│       └── hooks.json        # PreToolUse hook registration
+├── hooks/
+│   └── pretooluse.sh         # enforcement hook (disable via env or config)
 ├── skills/
 │   ├── detect-lsp/           # detects installed language servers
 │   ├── index/                # builds symbol index (LSP → ctags → rg)
@@ -497,7 +532,7 @@ codemunch/
 | **Runtime deps** | None (uses existing `rg`, `ctags`, `jq`) | Node.js (`npx`/`npm install -g`), SQLite |
 | **Background process** | None | MCP server running continuously |
 | **Storage** | `.claude/codemunch/index.json` (~142 KB) | SQLite database (grows with sessions) |
-| **Hook system** | None needed | 5+ hooks intercepting Bash, Read, WebFetch, Grep, Task |
+| **Hook system** | 1 PreToolUse hook (optional, disableable) | 5+ hooks intercepting Bash, Read, WebFetch, Grep, Task |
 | **Files it creates** | 1 JSON file | CLAUDE.md routing rules, SQLite DB, hooks config |
 | **Context savings** | **95.4%** on code exploration (benchmarked) | **98%** on raw tool output (claimed) |
 | **Scope** | Code navigation only | All tool output (bash, web, grep, screenshots) |
