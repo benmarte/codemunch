@@ -285,6 +285,7 @@ Session stats:
 | `/codemunch:index [--force]` | Manually rebuild index (rarely needed) | ~50 |
 | `/codemunch:disable` | Turn off enforcement (hook + CLAUDE.md rules) | — |
 | `/codemunch:enable` | Turn enforcement back on | — |
+| `/codemunch:upgrade` | Check for and install the latest version | — |
 
 ---
 
@@ -454,6 +455,21 @@ To re-enable:
 /codemunch:enable
 ```
 
+### Auto-update check
+
+codemunch checks for new releases once per day on session start. If an update is available, you'll see a notification:
+
+```
+Update available: v1.1.0 → v1.2.0
+Run /codemunch:upgrade to update.
+```
+
+The check is lightweight (single GitHub API call, 3s timeout, cached for 24 hours) and never blocks startup. To upgrade manually at any time:
+
+```bash
+/codemunch:upgrade
+```
+
 ---
 
 After init (or manual setup), just talk to Claude normally:
@@ -498,9 +514,10 @@ codemunch/
 ├── .claude-plugin/
 │   ├── plugin.json           # plugin manifest
 │   └── hooks/
-│       └── hooks.json        # PreToolUse hook registration
+│       └── hooks.json        # PreToolUse + SessionStart hook registration
 ├── hooks/
-│   └── pretooluse.sh         # enforcement hook (disable via env or config)
+│   ├── pretooluse.sh         # enforcement hook (disable via env or config)
+│   └── sessionstart.sh       # update check on startup (once per day)
 ├── skills/
 │   ├── detect-lsp/           # detects installed language servers
 │   ├── index/                # builds symbol index (LSP → ctags → rg)
@@ -519,7 +536,8 @@ codemunch/
     ├── status.md             # /codemunch:status
     ├── index.md              # /codemunch:index (manual, rarely needed)
     ├── disable.md            # /codemunch:disable (turn off enforcement)
-    └── enable.md             # /codemunch:enable (turn enforcement back on)
+    ├── enable.md             # /codemunch:enable (turn enforcement back on)
+    └── upgrade.md            # /codemunch:upgrade (check for updates)
 ```
 
 ---

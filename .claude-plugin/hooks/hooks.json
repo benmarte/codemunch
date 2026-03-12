@@ -1,6 +1,16 @@
 {
-  "description": "codemunch PreToolUse hook — nudges Read/Grep/Glob toward codemunch commands for token-efficient code exploration",
+  "description": "codemunch hooks — PreToolUse enforcement + SessionStart update check",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/sessionstart.sh"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Read",
