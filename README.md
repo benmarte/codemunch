@@ -283,6 +283,8 @@ Session stats:
 | `/codemunch:explore [path]` | Structured overview of project or file | ~15–200 |
 | `/codemunch:status` | Engine config, index freshness, session savings | — |
 | `/codemunch:index [--force]` | Manually rebuild index (rarely needed) | ~50 |
+| `/codemunch:disable` | Turn off enforcement (hook + CLAUDE.md rules) | — |
+| `/codemunch:enable` | Turn enforcement back on | — |
 
 ---
 
@@ -437,19 +439,20 @@ codemunch includes a **PreToolUse hook** that programmatically nudges Claude tow
 
 The hook doesn't block — it injects guidance so Claude self-corrects. Combined with `CLAUDE.md` instructions (from `/codemunch:init`), this achieves ~98% enforcement vs ~60-80% with instructions alone.
 
-**Disabling the hook:**
+**Disabling enforcement:**
 
-If you prefer codemunch as opt-in rather than enforced, disable the hook using either method:
+If you prefer codemunch as opt-in rather than enforced, disable it with a single command:
 
 ```bash
-# Option 1: Environment variable
-export CODEMUNCH_HOOK=off
-
-# Option 2: Config file (.claude/codemunch/config.json)
-echo '{ "hook_enabled": false }' > .claude/codemunch/config.json
+/codemunch:disable
 ```
 
-Re-enable by unsetting the env var or setting `"hook_enabled": true` in the config.
+This turns off the PreToolUse hook **and** removes the CLAUDE.md enforcement rules in one step. codemunch commands still work — they just won't be enforced.
+
+To re-enable:
+```bash
+/codemunch:enable
+```
 
 ---
 
@@ -514,7 +517,9 @@ codemunch/
     ├── refs.md               # /codemunch:refs
     ├── explore.md            # /codemunch:explore
     ├── status.md             # /codemunch:status
-    └── index.md              # /codemunch:index (manual, rarely needed)
+    ├── index.md              # /codemunch:index (manual, rarely needed)
+    ├── disable.md            # /codemunch:disable (turn off enforcement)
+    └── enable.md             # /codemunch:enable (turn enforcement back on)
 ```
 
 ---
