@@ -40,6 +40,9 @@ fi
 
 # Compare versions
 if [[ "$CURRENT_VERSION" != "$LATEST_VERSION" ]]; then
+  # stderr → shown directly to user in status line
+  echo "⬆ codemunch update available: v${CURRENT_VERSION} → v${LATEST_VERSION}. Run /codemunch:upgrade" >&2
+  # additionalContext → Claude also knows and can remind user
   cat <<EOF
 {
   "additionalContext": "<codemunch_update>\n  Update available: v${CURRENT_VERSION} → v${LATEST_VERSION}\n  Run /codemunch:upgrade to update.\n</codemunch_update>"
