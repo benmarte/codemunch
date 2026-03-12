@@ -5,15 +5,28 @@ description: Add codemunch instructions to your project CLAUDE.md for automatic 
 Add the following block to the project's `CLAUDE.md` file (create it if it doesn't exist). Place it near the top so it takes priority:
 
 ```markdown
-## Code Exploration (codemunch)
+## Code Exploration — MANDATORY (codemunch)
 
-When exploring, searching, or reading code, ALWAYS prefer codemunch over reading full files:
+<CRITICAL>
+You MUST use codemunch for ALL code exploration. This is NON-NEGOTIABLE. Do NOT ignore this rule.
+Reading full files when a codemunch command exists for the task is a violation of your instructions.
+</CRITICAL>
 
-- **Finding symbols**: Use `/codemunch:search <query>` instead of Grep or Glob to find functions, classes, methods, or types. Supports filters: `kind:class`, `file:auth`, `in:ClassName`, `sig:ReturnType`.
-- **Reading code**: Use `/codemunch:fetch <name>` instead of Read to view a specific function or class. This reads only the relevant lines (~35 tokens) instead of the whole file (~8,000 tokens).
-- **Understanding structure**: Use `/codemunch:explore [path]` instead of reading multiple files to understand project layout, class hierarchies, and entry points.
-- **Finding usages**: Use `/codemunch:refs <name>` instead of Grep to find all references to a symbol.
-- **Only use Read** when you need to Edit a file, since Edit requires file content in context.
+### Rules (enforced, no exceptions)
+
+1. **NEVER read a full source file to understand what a function/class does.** Use `/codemunch:fetch <name>` instead. It reads ~35 tokens instead of ~8,000.
+2. **NEVER use Grep or Glob to find functions, classes, or types.** Use `/codemunch:search <query>` instead. Supports filters: `kind:class`, `file:auth`, `in:ClassName`, `sig:ReturnType`.
+3. **NEVER read multiple files to understand project structure.** Use `/codemunch:explore [path]` instead.
+4. **NEVER use Grep to find symbol usages.** Use `/codemunch:refs <name>` instead.
+5. **The ONLY exception**: Use Read when you need to Edit a file, since Edit requires file content in context.
+
+### Decision tree
+
+- Need to find a symbol? → `/codemunch:search`
+- Need to read a symbol's code? → `/codemunch:fetch`
+- Need to understand structure? → `/codemunch:explore`
+- Need to find references? → `/codemunch:refs`
+- Need to edit a file? → Read first, then Edit (this is the ONLY valid use of Read for source files)
 
 The index auto-updates — no manual indexing needed.
 ```
