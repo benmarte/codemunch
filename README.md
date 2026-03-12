@@ -396,19 +396,28 @@ This adds instructions to your project's `CLAUDE.md` so Claude **automatically**
 Alternatively, add the instructions manually to your project's `CLAUDE.md`:
 
 ```markdown
-## Code Exploration (codemunch)
+## Code Exploration — MANDATORY (codemunch)
 
-When exploring, searching, or reading code, ALWAYS prefer codemunch over reading full files:
+<CRITICAL>
+You MUST use codemunch for ALL code exploration. This is NON-NEGOTIABLE. Do NOT ignore this rule.
+Reading full files when a codemunch command exists for the task is a violation of your instructions.
+</CRITICAL>
 
-- **Finding symbols**: Use `/codemunch:search <query>` instead of Grep or Glob to find functions,
-  classes, methods, or types. Supports filters: `kind:class`, `file:auth`, `in:ClassName`,
-  `sig:ReturnType`.
-- **Reading code**: Use `/codemunch:fetch <name>` instead of Read to view a specific function or
-  class. This reads only the relevant lines (~35 tokens) instead of the whole file (~8,000 tokens).
-- **Understanding structure**: Use `/codemunch:explore [path]` instead of reading multiple files to
-  understand project layout, class hierarchies, and entry points.
-- **Finding usages**: Use `/codemunch:refs <name>` instead of Grep to find all references to a symbol.
-- **Only use Read** when you need to Edit a file, since Edit requires file content in context.
+### Rules (enforced, no exceptions)
+
+1. **NEVER read a full source file to understand what a function/class does.** Use `/codemunch:fetch <name>` instead. It reads ~35 tokens instead of ~8,000.
+2. **NEVER use Grep or Glob to find functions, classes, or types.** Use `/codemunch:search <query>` instead. Supports filters: `kind:class`, `file:auth`, `in:ClassName`, `sig:ReturnType`.
+3. **NEVER read multiple files to understand project structure.** Use `/codemunch:explore [path]` instead.
+4. **NEVER use Grep to find symbol usages.** Use `/codemunch:refs <name>` instead.
+5. **The ONLY exception**: Use Read when you need to Edit a file, since Edit requires file content in context.
+
+### Decision tree
+
+- Need to find a symbol? → `/codemunch:search`
+- Need to read a symbol's code? → `/codemunch:fetch`
+- Need to understand structure? → `/codemunch:explore`
+- Need to find references? → `/codemunch:refs`
+- Need to edit a file? → Read first, then Edit (this is the ONLY valid use of Read for source files)
 
 The index auto-updates — no manual indexing needed.
 ```
@@ -472,6 +481,41 @@ codemunch/
     ├── status.md             # /codemunch:status
     └── index.md              # /codemunch:index (manual, rarely needed)
 ```
+
+---
+
+## How codemunch compares
+
+### codemunch vs context-mode
+
+[context-mode](https://github.com/mksglu/context-mode) is an MCP server that sandboxes raw tool output (bash, web fetches, grep) to keep it out of your context window. It solves a different problem than codemunch — here's how they compare:
+
+| Dimension | codemunch | context-mode |
+|---|---|---|
+| **What it solves** | Code exploration eats tokens (reading full files) | Tool output eats tokens (bash, web, grep dumps) |
+| **Architecture** | Pure Claude Code plugin — flat JSON index | MCP server + SQLite database + FTS5 search |
+| **Runtime deps** | None (uses existing `rg`, `ctags`, `jq`) | Node.js (`npx`/`npm install -g`), SQLite |
+| **Background process** | None | MCP server running continuously |
+| **Storage** | `.claude/codemunch/index.json` (~142 KB) | SQLite database (grows with sessions) |
+| **Hook system** | None needed | 5+ hooks intercepting Bash, Read, WebFetch, Grep, Task |
+| **Files it creates** | 1 JSON file | CLAUDE.md routing rules, SQLite DB, hooks config |
+| **Context savings** | **95.4%** on code exploration (benchmarked) | **98%** on raw tool output (claimed) |
+| **Scope** | Code navigation only | All tool output (bash, web, grep, screenshots) |
+| **License** | MIT | ELv2 (restrictive) |
+
+**Key insight:** They're complementary, not competing. codemunch prevents wasted tokens *before* they happen (by reading only the symbol you need). context-mode catches wasted tokens *after* they happen (by sandboxing large tool output). A user running both saves on code exploration (codemunch) AND on bash/web/grep output (context-mode).
+
+### Resource overhead
+
+| Resource | codemunch | context-mode |
+|---|---|---|
+| CPU at rest | 0 (no process) | MCP server idle |
+| Memory | 0 (no process) | Node.js process + SQLite |
+| Disk | ~142 KB JSON | SQLite DB (grows with sessions) |
+| npm packages | 0 | Full npm dependency tree |
+| Startup cost | None | MCP server spawn |
+
+codemunch's design goal is **zero-overhead infrastructure** — no server, no database, no npm. If you want context savings with the absolute minimum resource footprint, codemunch is the lighter option. If you need broader coverage (sandboxing all tool output, session continuity), context-mode adds that at the cost of more infrastructure.
 
 ---
 
