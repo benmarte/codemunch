@@ -46,14 +46,22 @@ Claude Code bills by token. Every file read costs tokens — and most of those t
 | Understand project structure | Read 10+ files (~80,000 tokens) | `explore` (~200 tokens) | **99.75%** |
 | Typical debugging session (30 lookups) | ~240,000 tokens | ~1,200 tokens | **99.5%** |
 
-### Real-world context savings
+### Benchmarked context savings
 
-In a typical session exploring a mid-size codebase (~100 files, ~1,200 symbols):
+We benchmarked codemunch against two real open-source repos — running 5 typical exploration tasks on each and measuring token consumption with vs without codemunch:
 
-- **Without codemunch**: Claude reads ~20 full files to investigate a bug → **~160,000 tokens consumed** just on file reads
-- **With codemunch**: Claude searches, fetches, and traces refs → **~800 tokens consumed** for the same information
+| Repo | Size | Traditional | codemunch | Savings |
+|---|---|---|---|---|
+| [expressjs/cors](https://github.com/expressjs/cors) | 6 files, ~8K tokens | 18,810 tokens | 1,281 tokens | **93.2%** |
+| [koajs/koa](https://github.com/koajs/koa) | 82 files, ~52K tokens | 24,565 tokens | 2,316 tokens | **90.6%** |
+| **Combined (10 tasks)** | **88 files** | **43,375 tokens** | **3,597 tokens** | **91.7%** |
 
-That's **200x less context usage**, which means:
+Best case: **98.6% savings** (finding all references to a function — `refs` instead of grep + reading files).
+Worst case: **69.8% savings** (multi-fetch of related functions — still cheaper than reading one full file).
+
+> Full benchmark methodology and per-task breakdown: [docs/benchmark-results.md](docs/benchmark-results.md)
+
+That's **~12x less context usage** on average, which means:
 
 - **Longer conversations** — you stay well within Claude's context window instead of hitting limits mid-task
 - **Lower costs** — fewer tokens consumed per task directly reduces your API bill
