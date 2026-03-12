@@ -9,7 +9,7 @@
  ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝
 ```
 
-**Zero-config, token-efficient code exploration for Claude Code — any language, auto-indexed**
+**Zero-config, token-efficient code exploration for Claude Code — no MCP server, no Python, no database**
 
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet?logo=anthropic&logoColor=white)](https://claude.ai/code)
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e.svg)](LICENSE)
@@ -24,7 +24,9 @@
 
 When Claude Code explores a codebase, the naive approach is to read whole files. An 800-line file costs ~8,000 tokens. Read ten files to find one function and you've burned 80,000 tokens before writing a single line of code.
 
-**codemunch fixes this.** It auto-indexes your codebase and lets Claude fetch the exact 20 lines it needs instead of the 800-line file. No setup required — just start using it.
+Other solutions add an MCP server, a Python runtime, or a database — all of which consume their own resources and add complexity. codemunch takes a different approach: **a pure Claude Code plugin that runs with zero infrastructure overhead.**
+
+**codemunch fixes this.** It auto-indexes your codebase into a flat JSON file and lets Claude fetch the exact 20 lines it needs instead of the 800-line file. No server process, no database daemon, no Python dependency — just install and start using it.
 
 ```
 Without codemunch:  read auth.ts (800 lines) → ~8,000 tokens
@@ -371,7 +373,7 @@ scoop install ctags ripgrep jq
 
 codemunch works with just **one** of the above, but having all three gives you the best results — LSP for precision, ctags for breadth, and ripgrep as a safety net.
 
-**No Python packages. No npm install. No compilation.**
+**No MCP server. No Python packages. No database. No npm install. No background processes. No compilation.**
 
 ---
 
@@ -510,7 +512,7 @@ Yes: `/codemunch:index --force` rebuilds from scratch.
 
 ## Inspiration
 
-Conceptually inspired by [jgravelle/jcodemunch-mcp](https://github.com/jgravelle/jcodemunch-mcp) — a Python MCP server using tree-sitter for symbol-based retrieval. This plugin is an independent reimplementation as a native Claude Code plugin: no shared code, no Python dependency, 40+ languages via the LSP/ctags/rg tier system.
+Conceptually inspired by [jgravelle/jcodemunch-mcp](https://github.com/jgravelle/jcodemunch-mcp) — a Python MCP server using tree-sitter for symbol-based retrieval. This plugin is an independent reimplementation as a native Claude Code plugin: no shared code, no MCP server, no Python dependency, no database — just a flat JSON index and 40+ languages via the LSP/ctags/rg tier system.
 
 ---
 
