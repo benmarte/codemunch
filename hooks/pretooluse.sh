@@ -1,7 +1,7 @@
 #!/bin/bash
 # codemunch PreToolUse hook
 # Intercepts Read/Grep/Glob on source files and redirects to codemunch commands.
-# Zero deps — just bash and jq (already a codemunch optional dep).
+# Requires jq for JSON parsing — silently exits if jq is not available.
 
 set -euo pipefail
 
@@ -12,6 +12,11 @@ set -euo pipefail
 #
 # Either method silently disables enforcement. Re-enable by unsetting the env
 # var or setting "hook_enabled": true in the config.
+
+# Bail early if jq is not available — hook cannot parse JSON without it
+if ! command -v jq &>/dev/null; then
+  exit 0
+fi
 
 if [[ "${CODEMUNCH_HOOK:-}" == "off" ]]; then
   exit 0
