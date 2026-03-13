@@ -28,8 +28,18 @@ if [[ -f "$LAST_CHECK_FILE" ]]; then
   fi
 fi
 
+# Bail if gh CLI is not available
+if ! command -v gh &>/dev/null; then
+  exit 0
+fi
+
 # Check GitHub for latest release (timeout after 3s to not block startup)
-LATEST_VERSION=$(timeout 3 gh api repos/benmarte/codemunch/releases/latest --jq '.tag_name' 2>/dev/null | sed 's/^v//' || echo "")
+if command -v timeout &>/dev/null; then
+  LATEST_VERSION=$(timeout 3 gh api repos/benmarte/codemunch/releases/latest --jq '.tag_name' 2>/dev/null | sed 's/^v//' || echo "")
+else
+  # macOS fallback: gh without timeout wrapper
+  LATEST_VERSION=$(gh api repos/benmarte/codemunch/releases/latest --jq '.tag_name' 2>/dev/null | sed 's/^v//' || echo "")
+fi
 
 # Record check time regardless of result
 date +%s > "$LAST_CHECK_FILE"
