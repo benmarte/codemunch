@@ -14,12 +14,12 @@ LAST_CHECK_FILE="$CACHE_DIR/last_update_check"
 if [[ ! -f "$VERSION_FILE" ]]; then
   exit 0
 fi
-CURRENT_VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
+CURRENT_VERSION=$(tr -d '[:space:]' < "$VERSION_FILE")
 
 # Only check once per day
 mkdir -p "$CACHE_DIR"
 if [[ -f "$LAST_CHECK_FILE" ]]; then
-  LAST_CHECK=$(cat "$LAST_CHECK_FILE")
+  LAST_CHECK=$(< "$LAST_CHECK_FILE")
   NOW=$(date +%s)
   ELAPSED=$(( NOW - LAST_CHECK ))
   # 86400 = 24 hours

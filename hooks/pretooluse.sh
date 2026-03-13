@@ -30,19 +30,19 @@ fi
 SOURCE_EXTS='\.ts$|\.tsx$|\.js$|\.jsx$|\.py$|\.go$|\.rs$|\.rb$|\.java$|\.kt$|\.c$|\.cpp$|\.h$|\.hpp$|\.cs$|\.php$|\.swift$|\.lua$|\.zig$|\.ex$|\.exs$|\.hs$|\.ml$|\.mli$|\.scala$|\.sh$|\.bash$|\.vue$|\.svelte$'
 
 # Read JSON from stdin
-INPUT=$(cat)
+INPUT=$(< /dev/stdin)
 
-TOOL=$(echo "$INPUT" | jq -r '.tool_name // ""')
-TOOL_INPUT=$(echo "$INPUT" | jq -r '.tool_input // {}')
+TOOL=$(jq -r '.tool_name // ""' <<< "$INPUT")
+TOOL_INPUT=$(jq -r '.tool_input // {}' <<< "$INPUT")
 
 # Helper: check if a path is a source file
 is_source_file() {
-  echo "$1" | grep -qE "$SOURCE_EXTS"
+  grep -qE "$SOURCE_EXTS" <<< "$1"
 }
 
 case "$TOOL" in
   Read)
-    FILE_PATH=$(echo "$TOOL_INPUT" | jq -r '.file_path // ""')
+    FILE_PATH=$(jq -r '.file_path // ""' <<< "$TOOL_INPUT")
 
     # Skip non-source files (config, json, md, yaml, etc.)
     if ! is_source_file "$FILE_PATH"; then
@@ -58,7 +58,7 @@ GUIDANCE
     ;;
 
   Grep)
-    PATTERN=$(echo "$TOOL_INPUT" | jq -r '.pattern // ""')
+    PATTERN=$(jq -r '.pattern // ""' <<< "$TOOL_INPUT")
 
     # Check if grep pattern looks like a symbol search:
     # - keyword prefixes (function, class, def, etc.)
@@ -66,7 +66,7 @@ GUIDANCE
     # - camelCase identifiers (validateToken, getUserById)
     # - snake_case identifiers (validate_token, get_user)
     # - identifiers followed by ( (function calls)
-    if echo "$PATTERN" | grep -qE '^(function |class |def |fn |func |type |interface |struct |enum |const |let |var |export |import |module )|^[A-Z][a-zA-Z0-9_]+$|^[a-z][a-zA-Z0-9]*[A-Z][a-zA-Z0-9_]*$|^[a-z]+(_[a-z]+)+$|^[a-zA-Z_][a-zA-Z0-9_]*\s*\('; then
+    if grep -qE '^(function |class |def |fn |func |type |interface |struct |enum |const |let |var |export |import |module )|^[A-Z][a-zA-Z0-9_]+$|^[a-z][a-zA-Z0-9]*[A-Z][a-zA-Z0-9_]*$|^[a-z]+(_[a-z]+)+$|^[a-zA-Z_][a-zA-Z0-9_]*\s*\(' <<< "$PATTERN"; then
       cat <<'GUIDANCE'
 {
   "additionalContext": "<codemunch_enforcement>\n  This grep pattern looks like a symbol search. Use codemunch instead:\n\n  - Finding a function/class/type by name? → /codemunch:search <name>\n  - Finding all references to a symbol? → /codemunch:refs <name>\n  - Finding symbols of a specific kind? → /codemunch:search kind:class (or kind:function, kind:method)\n\n  codemunch's index is faster and more precise than grep for symbol lookups.\n</codemunch_enforcement>"
@@ -79,10 +79,10 @@ GUIDANCE
     ;;
 
   Glob)
-    PATTERN=$(echo "$TOOL_INPUT" | jq -r '.pattern // ""')
+    PATTERN=$(jq -r '.pattern // ""' <<< "$TOOL_INPUT")
 
     # Check if glob is searching for source files
-    if echo "$PATTERN" | grep -qE "$SOURCE_EXTS"; then
+    if grep -qE "$SOURCE_EXTS" <<< "$PATTERN"; then
       cat <<'GUIDANCE'
 {
   "additionalContext": "<codemunch_enforcement>\n  You're searching for source files. Consider using codemunch instead:\n\n  - Understanding project structure? → /codemunch:explore [path]\n  - Finding a specific symbol? → /codemunch:search <name>\n\n  codemunch gives you structured symbol maps without reading file contents.\n</codemunch_enforcement>"
