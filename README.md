@@ -455,6 +455,35 @@ To re-enable:
 /codemunch:enable
 ```
 
+### Upgrading
+
+#### If you already have the upgrade command
+
+```bash
+/codemunch:upgrade
+```
+
+#### If you don't have the upgrade command (older installs)
+
+The plugin system caches marketplace clones locally. If your install predates the upgrade command, you need to update the marketplace clone first:
+
+```bash
+# 1. Update the marketplace clone
+cd ~/.claude/plugins/marketplaces/codemunch && git pull origin main
+
+# 2. Reinstall the plugin
+/plugin update codemunch@codemunch
+```
+
+If `/plugin update` still shows "already at the latest version", uninstall and reinstall:
+
+```bash
+/plugin uninstall codemunch@codemunch
+/plugin install codemunch@codemunch
+```
+
+After this, `/codemunch:upgrade` will be available for all future updates.
+
 ### Auto-update check
 
 codemunch checks for new releases once per day on session start. If an update is available, you'll see a notification:
@@ -464,11 +493,7 @@ Update available: v1.1.0 → v1.2.0
 Run /codemunch:upgrade to update.
 ```
 
-The check is lightweight (single GitHub API call, 3s timeout, cached for 24 hours) and never blocks startup. To upgrade manually at any time:
-
-```bash
-/codemunch:upgrade
-```
+The check is lightweight (single GitHub API call, 3s timeout, cached for 24 hours) and never blocks startup.
 
 ---
 
