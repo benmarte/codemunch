@@ -7,10 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-03-13
+
 ### Fixed
 - Replace echo-pipe patterns with herestrings and input redirection in hooks
 - Add jq availability guard to PreToolUse hook
 - Add gh/timeout guards to SessionStart hook for portability
+- Updated .gitignore with codemunch, editor, and OS entries
 
 ### Added
 - Upgrade instructions for users with stale installs (pre-upgrade-command)
@@ -41,7 +44,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Support for TypeScript, JavaScript, Python, Go, Rust, Ruby, Java, C#, PHP, Swift, Kotlin
 - Benchmark results: 91.7% context savings
 
-[Unreleased]: https://github.com/benmarte/codemunch/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/benmarte/codemunch/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/benmarte/codemunch/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/benmarte/codemunch/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/benmarte/codemunch/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/benmarte/codemunch/releases/tag/v1.0.0
